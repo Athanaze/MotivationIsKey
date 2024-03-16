@@ -70,6 +70,20 @@ export function getAllTransactions(monkey: string | null, callback: (transaction
 	})
 }
 
+export function getAllTransactionsGivenUnit(unit: string, callback: (transactions: TransactionEntry[]) => void) {
+	DB.serialize(() => {
+		const stmt = DB.prepare("SELECT * FROM transactions WHERE unit = ?");			
+		stmt.all(unit, (err, transactions: TransactionEntry[]) => {
+			if (err) {
+				logger.error(err)
+			} else {
+				callback(transactions)
+			}
+		})
+	})
+}
+
+
 DB.run('CREATE TABLE "transactions" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "sending_monkey" TEXT NOT NULL, "receiving_monkey" TEXT NOT NULL, "amount" INTEGER NOT NULL, "unit" TEXT NOT NULL, "reason" TEXT NOT NULL)', (err) => {
 	if (err) {
 		logger.info("SQL: table transactions already created")

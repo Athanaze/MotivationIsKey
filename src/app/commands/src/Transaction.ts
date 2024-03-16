@@ -104,6 +104,11 @@ export default class Transaction extends Command {
 							.setDescription("an animal that lives in hot countries, has a long tail, and climbs trees.")
 					)
 			)
+			.addSubcommand(subcommand =>
+				subcommand
+					.setName("PIB")
+					.setDescription("Produit Intérieur Bananier")
+			)
 	}
 
 	override async execute(bot: Bot, interaction: Interaction) {
@@ -162,6 +167,18 @@ export default class Transaction extends Command {
 
 				const target = monkey ?? interaction.user
 				getAllTransactions(target.id, async (transactions) => {
+					if (transactions.length === 0) interaction.reply("No pending transaction for the given user !")
+					else {
+						await interaction.reply(`Account of ${target.displayName}`)
+						transactions.forEach(async transaction => {
+							channel.send(await buildTransactionMessage(transaction, "Pending transaction", channel.guild, false))
+						})
+					}
+				})
+			}
+
+			if (subCommand === "PIB") {
+				getAllTransactionsGivenUnit("banane", async (transactions) => {
 					if (transactions.length === 0) interaction.reply("No pending transaction for the given user !")
 					else {
 						await interaction.reply(`Account of ${target.displayName}`)
